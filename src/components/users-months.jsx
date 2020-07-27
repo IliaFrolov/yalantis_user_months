@@ -8,10 +8,19 @@ import Divider from '@material-ui/core/Divider';
 import Typography from '@material-ui/core/Typography';
 import Badge from '@material-ui/core/Badge';
 
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+
+import BadgeColored from './badge-colored'
+
 import { GetUsers } from '../services/user-service'
 import '../styles/user-months-style.sass'
 
-import { Container } from '@material-ui/core';
+import { Container, Button } from '@material-ui/core';
 
 class UsersMonths extends React.Component {
     constructor(props) {
@@ -60,22 +69,28 @@ class UsersMonths extends React.Component {
     }
 
     colorMarker(userAmound) {
-        let colorClass = ''
+
+        const grey = '#b0bec5'
+        const blue = '#2196f3'
+        const green = '#8bc34a'
+        const red = '#f44336'
+        let colorClass
         switch (true) {
             case userAmound >= 3 && userAmound <= 6:
-                colorClass = 'blue'
+                colorClass = blue
                 break;
             case (userAmound >= 7 && userAmound <= 10):
-                colorClass = 'green'
+                colorClass = green
                 break;
             case (userAmound >= 11):
-                colorClass = 'red'
+                colorClass = red
                 break;
             default:
-                colorClass = 'grey';
+                colorClass = grey
         }
         return colorClass
     }
+
     infoScreen(info) {
         return <Grid style={{ height: '100vh' }} container alignItems="center" justify="center">
             <Grid item xs={12}>
@@ -83,17 +98,17 @@ class UsersMonths extends React.Component {
             </Grid>
         </Grid>
     }
-    handleMouseOver(users, e) {
-        this.setState({ selectedUsers: users })
-    }
 
-    handleMouseOut(e) {
-        this.setState({ selectedUsers: [] })
+    handleMouseOver(users, e) {
+        const previous = document.getElementsByClassName('selected');
+        if (previous.length > 0) previous.item(0).classList.remove('selected')
+        this.setState({ selectedUsers: users })
+        e.currentTarget.classList.add('selected')
     }
 
     render() {
-
         const { error, isLoaded, usersMonths, selectedUsers } = this.state;
+
         if (error) {
             return this.infoScreen(error.message);
         } else if (!isLoaded) {
@@ -101,33 +116,67 @@ class UsersMonths extends React.Component {
         } else {
             return (
                 <Grid className='users-months' container spacing={2}>
-                    <Grid item xs={12}>
-                        <Grid container justify="center" spacing={2}>
+                    <Grid item xs={3}>
+                        <Grid container style={{ height: '90vh' }} alignItems="center" justify="center" spacing={2}>
                             {usersMonths.map(month => (
-                                <Grid className='month' xm={12} xs={1} key={month.number} item>
-                                    <Paper className={this.colorMarker(month.users.length)} onMouseOver={this.handleMouseOver.bind(this, month.users)} onMouseOut={this.handleMouseOut.bind(this)}>
-                                        <Typography align='center' className='month_name'>{month.name}</Typography>
-                                    </Paper>
+                                <Grid className='month' xm={6} xs={6} key={month.number} item>
+                                    <BadgeColored color={this.colorMarker(month.users.length)} badgeContent={month.users.length}>
+                                        <Button style={{ width: '100%' }} className={`${this.colorMarker(month.users.length)} month_box`} 
+                                        onMouseOver={this.handleMouseOver.bind(this, month.users)} 
+                                        onClick={this.handleMouseOver.bind(this, month.users)} >
+                                            <Typography align='center' className='month_name'>{month.name}</Typography>
+                                        </Button>
+                                    </BadgeColored>
                                 </Grid>
                             ))}
                         </Grid>
-                        <Grid container justify="center" className='users-table'>
-                            <Paper>
-                                <List >
-                                    {selectedUsers.map(user => (
-                                        <ListItem button key={user.id}>
-                                            <ListItemText >
-                                                {user.firstName} {user.lastName} {(user.dob)}
-                                            </ListItemText>
-                                            <Divider component="li" />
-                                        </ListItem>
-                                    ))}
-                                </List>
-                            </Paper>
-                        </Grid>
                     </Grid>
+                    <Grid item xs={9} style={{ height: '90vh' }} container justify="center">
+                        <UsersTable />
+                    </Grid>
+
                 </Grid>
             );
+        }
+
+        function UsersTable() {
+
+            if (selectedUsers.length > 0) {
+                return <TableContainer component={Paper}>
+                    <Table className='users-table' size="small" aria-label="simple table">
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>First name</TableCell>
+                                <TableCell align="right">Last name</TableCell>
+                                <TableCell align="right">DOB</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {selectedUsers.map((user) => (
+                                <TableRow key={user.id}>
+                                    <TableCell component="th" scope="row">
+                                        {user.firstName}
+                                    </TableCell>
+                                    <TableCell align="right">{user.lastName}</TableCell>
+                                    <TableCell align="right">{user.dob}</TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            } else {
+                return <TableContainer component={Paper}>
+                    <Table className='users-table' size="small" aria-label="simple table">
+                        <TableBody>
+                            <TableRow>
+                                <TableCell>
+                                    <Typography style={{ padding: '50px' }} align='center' variant='h3' className='users-table-placeholder'>Pleace select month to show users</Typography>
+                                </TableCell>
+                            </TableRow>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            }
         }
     }
 }
