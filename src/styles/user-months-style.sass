@@ -11,13 +11,15 @@
     background-color: #f44336 !important
 
 .users-months 
-    background-color: lightgray
+    
     height: 100vh
     padding: 10px 40px
     .month
-        &:hover > .users-table 
-            clip: rect(auto, auto, auto, auto) !important
-            // visibility: visible
+        &_box
+            opacity: 80%
+        .selected
+            opacity: 100%
+
         &_name 
             padding: 20px
             text-transform: uppercase
@@ -26,7 +28,11 @@
             color: white !important
             font-family: Lato
     .users-table 
-        clip: rect(0, auto, 0, auto)
-        // visibility: hidden
+        min-width: 650px
+        // clip: rect(0, auto, 0, auto)
+        background-color: rgba(255, 255, 255, .3)
+        color: #FFF
+    .users-table-placeholder
+
 
 
