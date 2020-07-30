@@ -1,11 +1,11 @@
 import React from 'react';
 import './App.css';
 
-import UsersMounths from './components/users-months'
+import { UsersMonths } from './components/UserMonth'
 
 function App() {
   return (
-    <UsersMounths/>
+    <UsersMonths />
   )
 }
 
